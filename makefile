@@ -5,6 +5,7 @@ clean:
 stop:
 	docker compose down
 start:
+	docker compose pull
 	docker compose up -d
 restart: stop start
 
