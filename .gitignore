@@ -1,5 +1,2 @@
 data/electrum/mainnet
-data/explorer/api
-data/explorer/geoip
-data/explorer/mysql
 data/peer/main
