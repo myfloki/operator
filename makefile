@@ -7,6 +7,7 @@ stop:
 start:
 	-docker compose pull
 	docker compose up -d
+	docker logs -f mainnet-flokicoin-peer
 restart: stop start
 
 restart_electrum:
