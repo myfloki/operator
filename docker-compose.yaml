@@ -8,7 +8,8 @@ services:
     restart: on-failure
     stop_grace_period: 1m
     ports:
-      - "15212:15212" 
+      - "15212:15212"
+      - "15213:15213"
     volumes:
       - ./data/peer:/node
     command: "flokicoind -C=/node/flokicoind.conf --txindex" # --debuglevel=trace
