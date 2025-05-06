@@ -23,3 +23,11 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook
 ```
 
 If unset, Discord notifications are skipped.
+
+### Health Check Cron
+
+To automatically monitor and restart Electrum if unhealthy, register a cron job:
+
+```sh
+make register_cron
+```
