@@ -18,19 +18,6 @@ services:
     hostname: mainnet-electrum
     container_name: mainnet-electrum
     image: ghcr.io/myfloki/electrum:latest
-    restart: always
-    stop_grace_period: 30s
-    ports:
-      - "50001:50001" 
-      - "50002:50002" # SSL port
-    volumes:
-      - ./data/electrum:/data
-    command: "electrs --conf /data/config.toml"
-
-  electrum:
-    hostname: mainnet-electrum
-    container_name: mainnet-electrum
-    image: ghcr.io/myfloki/electrum:latest
     ports:
       - "50001:50001" 
       - "50002:50002" # SSL port
@@ -44,6 +31,6 @@ services:
       timeout: 10s
       retries: 2
       start_period: 10m
-    restart: on-failure
+    restart: always
     command: "electrs --conf /data/config.toml"
 
