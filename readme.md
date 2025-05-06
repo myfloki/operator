@@ -1,17 +1,25 @@
-
-This repository offers a package to deploy a full node environment + electrum server, enhancing network security and supporting community expansion.
+This repository offers a package to deploy a full node environment with an Electrum server, enhancing network security and supporting community expansion.
 
 Included Components:
-- flokicoin node
-- electrum service
+- Flokicoin node
+- Electrum service
 
 # Requirements
 
-- make 
-- docker & docker compose
+- make  
+- Docker and Docker Compose
 
 # Usage
 
 ```sh
 make start
 ```
+
+**Optional: Enable Discord Alerts**  
+To receive alerts when the Electrum server is down, set `DISCORD_WEBHOOK_URL` in your `.env` file:
+
+```env
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook
+```
+
+If unset, Discord notifications are skipped.

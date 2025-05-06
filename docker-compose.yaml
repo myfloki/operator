@@ -27,3 +27,23 @@ services:
       - ./data/electrum:/data
     command: "electrs --conf /data/config.toml"
 
+  electrum:
+    hostname: mainnet-electrum
+    container_name: mainnet-electrum
+    image: ghcr.io/myfloki/electrum:latest
+    ports:
+      - "50001:50001" 
+      - "50002:50002" # SSL port
+    volumes:
+      - ./data/electrum:/data
+    environment:
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 1m
+      timeout: 10s
+      retries: 2
+      start_period: 10m
+    restart: on-failure
+    command: "electrs --conf /data/config.toml"
+
