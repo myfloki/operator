@@ -12,16 +12,16 @@ services:
       - "15213:15213"
     volumes:
       - ./data/peer:/node
-    command: "flokicoind -C=/node/flokicoind.conf --txindex" # --debuglevel=trace
+    command: "flokicoind -C=/node/flokicoind.conf --txindex"
 
 
   electrum:
     hostname: mainnet-electrum
     container_name: mainnet-electrum
-    image: ghcr.io/myfloki/electrum:latest
+    image: ghcr.io/myfloki/electrs:latest
     ports:
       - "50001:50001" 
-      - "50002:50002" # SSL port
+      - "3000:3000"
     volumes:
       - ./data/electrum:/data
     environment:
@@ -33,5 +33,15 @@ services:
       retries: 2
       start_period: 10m
     restart: always
-    command: "electrs --conf /data/config.toml"
+    command: >
+      electrs -vvv
+        --network mainnet
+        --db-dir /data
+        --jsonrpc-import
+        --daemon-rpc-addr mainnet-flokicoin-peer:15213
+        --electrum-rpc-addr 0.0.0.0:50001
+        --http-addr 0.0.0.0:3000
+        --cookie user:pass
+        --enable-json-rpc-logging
+        --index-unspendables
 
