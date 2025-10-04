@@ -35,6 +35,7 @@ services:
     restart: always
     command: >
       electrs -vvv
+        --address-search
         --network mainnet
         --db-dir /data
         --jsonrpc-import
