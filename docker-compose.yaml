@@ -12,7 +12,7 @@ services:
       - "15213:15213"
     volumes:
       - ./data/peer:/node
-    command: "flokicoind -C=/node/flokicoind.conf --txindex"
+    command: "lokid -C=/node/lokid.conf --txindex"
 
 
   electrum:
