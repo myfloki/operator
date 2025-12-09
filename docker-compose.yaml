@@ -46,3 +46,15 @@ services:
         --enable-json-rpc-logging
         --index-unspendables
 
+  electrum_ssl:
+    hostname: mainnet-electrum-ssl
+    container_name: mainnet-electrum-ssl
+    image: nginx:1.25-alpine
+    depends_on:
+      - electrum
+    ports:
+      - "50002:50002"
+    volumes:
+      - ./data/electrum:/data:ro
+      - ./ops/nginx-electrum.conf:/etc/nginx/nginx.conf:ro
+    restart: always

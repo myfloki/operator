@@ -1,2 +1,4 @@
 data/electrum/mainnet
+data/electrum/letsencrypt
+data/electrum/ssl
 data/peer/main

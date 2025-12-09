@@ -2,6 +2,7 @@
 HEALTH_SCRIPT = healthmon.sh
 HEALTH_LOG = /var/log/healthmon.log
 HEALTH_CRON_SCHEDULE = */1 * * * *
+SSL_SCRIPT = ./ops/ssl.sh
 
 clean:
 	-rm -rf ./data/electrum/mainnet
@@ -28,3 +29,9 @@ register_cron:
 	CRON_ENTRY="$(HEALTH_CRON_SCHEDULE) $$CRON_CMD"; \
 	crontab -l 2>/dev/null | grep -F "$$CRON_ENTRY" >/dev/null || (crontab -l 2>/dev/null; echo "$$CRON_ENTRY") | crontab -
 	@echo "[OK] cron registred"
+
+ssl:
+	@bash $(SSL_SCRIPT) ensure
+
+renew:
+	@bash $(SSL_SCRIPT) renew
