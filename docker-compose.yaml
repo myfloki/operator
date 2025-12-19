@@ -1,10 +1,9 @@
 
 services:
 
-  flokicoin_peer:
+  flokicoin-peer:
     image: ghcr.io/myfloki/flokicoin:latest
     hostname: mainnet-flokicoin-peer
-    container_name: mainnet-flokicoin-peer
     restart: on-failure
     stop_grace_period: 1m
     ports:
@@ -17,7 +16,6 @@ services:
 
   electrum:
     hostname: mainnet-electrum
-    container_name: mainnet-electrum
     image: ghcr.io/myfloki/electrs:latest
     ports:
       - "50001:50001" 
@@ -48,7 +46,6 @@ services:
 
   electrum-ws-bridge:
     image: alpine:latest
-    container_name: electrum-ws-bridge
     command: /bin/sh /ops/start-electrum-ws-bridge.sh
     links:
       - electrum
@@ -57,9 +54,8 @@ services:
       - ./ops:/ops
     restart: always
 
-  electrum_ssl:
+  electrum-ssl:
     hostname: mainnet-electrum-ssl
-    container_name: mainnet-electrum-ssl
     image: nginx:1.25-alpine
     depends_on:
       - electrum
