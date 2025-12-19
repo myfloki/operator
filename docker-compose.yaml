@@ -49,9 +49,12 @@ services:
   electrum-ws-bridge:
     image: alpine:latest
     container_name: electrum-ws-bridge
-    command: /bin/sh -c "apk add --no-cache websocat && websocat --binary --exit-on-eof --ping-interval 30 ws-l:0.0.0.0:5555 tcp:electrum:50001"
+    command: /bin/sh /ops/start-electrum-ws-bridge.sh
     links:
       - electrum
+    volumes:
+      - ./data/sockets:/sockets
+      - ./ops:/ops
     restart: always
 
   electrum_ssl:
@@ -67,4 +70,5 @@ services:
     volumes:
       - ./data/electrum:/data:ro
       - ./ops/nginx-electrum.conf:/etc/nginx/nginx.conf:ro
+      - ./data/sockets:/sockets
     restart: always
