@@ -46,14 +46,24 @@ services:
         --enable-json-rpc-logging
         --index-unspendables
 
+  electrum-ws-bridge:
+    image: alpine:latest
+    container_name: electrum-ws-bridge
+    command: /bin/sh -c "apk add --no-cache websocat && websocat --binary ws-l:0.0.0.0:5555 tcp:electrum:50001"
+    links:
+      - electrum
+    restart: always
+
   electrum_ssl:
     hostname: mainnet-electrum-ssl
     container_name: mainnet-electrum-ssl
     image: nginx:1.25-alpine
     depends_on:
       - electrum
+      - electrum-ws-bridge
     ports:
       - "50002:50002"
+      - "50004:50004"
     volumes:
       - ./data/electrum:/data:ro
       - ./ops/nginx-electrum.conf:/etc/nginx/nginx.conf:ro
