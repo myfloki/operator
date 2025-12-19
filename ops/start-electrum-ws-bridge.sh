@@ -29,4 +29,4 @@ apk add --no-cache websocat
 # -b: Binary mode
 # l-ws-unix: Listen on Unix socket
 echo "Launching websocat..."
-exec websocat -E -b l-ws-unix:"$SOCKET_FILE" tcp:electrum:50001
+exec websocat -v -E l-ws-unix:"$SOCKET_FILE" tcp:electrum:50001
