@@ -1,7 +1,6 @@
-
-HEALTH_SCRIPT = healthmon.sh
+HEALTH_SCRIPT = ./ops/health-check.sh
 HEALTH_LOG = /var/log/healthmon.log
-HEALTH_CRON_SCHEDULE = */1 * * * *
+
 SSL_SCRIPT = ./ops/ssl.sh
 
 clean:
@@ -11,7 +10,7 @@ stop:
 start:
 	@-docker compose pull
 	@docker compose up -d
-	$(MAKE) register_cron
+	@echo "Services started. Use 'make cron_install' to enable health monitoring."
 	@docker logs -f mainnet-flokicoin-peer
 	
 restart: stop start
@@ -23,12 +22,14 @@ upgrade:
 	-docker compose pull
 	docker compose up -d
 
-register_cron:
-	@chmod +x $(HEALTH_SCRIPT)
-	@CRON_CMD="cd $$(dirname $$(realpath $(lastword $(MAKEFILE_LIST)))) && ./$(HEALTH_SCRIPT) >> $(HEALTH_LOG) 2>&1"; \
-	CRON_ENTRY="$(HEALTH_CRON_SCHEDULE) $$CRON_CMD"; \
-	crontab -l 2>/dev/null | grep -F "$$CRON_ENTRY" >/dev/null || (crontab -l 2>/dev/null; echo "$$CRON_ENTRY") | crontab -
-	@echo "[OK] cron registred"
+cron_install:
+	@bash ./ops/register-cron.sh
+
+cron_uninstall:
+	@bash ./ops/unregister-cron.sh
+
+test:
+	@bash ./ops/test-services.sh
 
 ssl:
 	@bash $(SSL_SCRIPT) ensure
