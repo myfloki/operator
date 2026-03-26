@@ -11,7 +11,7 @@ start:
 	@-docker compose pull
 	@docker compose up -d
 	@echo "Services started. Use 'make cron_install' to enable health monitoring."
-	@docker logs -f mainnet-flokicoin-peer
+	@docker logs -f operator-flokicoin-peer-1
 	
 restart: stop start
 

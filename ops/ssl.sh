@@ -12,6 +12,7 @@ fi
 
 SSL_DIR="${REPO_ROOT}/data/electrum/ssl"
 LE_DIR="${REPO_ROOT}/data/electrum/letsencrypt"
+LE_WORK_DIR="${REPO_ROOT}/data/electrum/letsencrypt-work"
 CERT_FILE="${SSL_DIR}/server.crt"
 KEY_FILE="${SSL_DIR}/server.key"
 CERTBOT_IMAGE="${CERTBOT_IMAGE:-certbot/certbot:latest}"
@@ -41,12 +42,31 @@ require_env() {
   fi
 }
 
+# Ensure ports 80/443 are free before running certbot standalone
+preflight_check() {
+  local blocked=0
+  for port in 80 443; do
+    if ss -tlnp 2>/dev/null | grep -q ":${port} "; then
+      echo "[ssl] ERROR: port ${port} is already in use — stop the service occupying it first"
+      ss -tlnp 2>/dev/null | grep ":${port} "
+      blocked=1
+    fi
+  done
+  if (( blocked )); then
+    echo "[ssl] hint: if docker-compose services are running, try 'make stop' first"
+    exit 1
+  fi
+}
+
 run_certbot() {
-  echo "[ssl] requesting/renewing certificate for ${DOMAIN} via Let's Encrypt"
+  preflight_check
+  echo "[ssl] requesting certificate for ${DOMAIN} via Let's Encrypt"
+  mkdir -p "${LE_WORK_DIR}" "${LE_DIR}/logs"
   docker run --rm \
     -p 80:80 -p 443:443 \
     -v "${LE_DIR}:/etc/letsencrypt" \
-    -v "${LE_DIR}:/var/lib/letsencrypt" \
+    -v "${LE_WORK_DIR}:/var/lib/letsencrypt" \
+    -v "${LE_DIR}/logs:/var/log/letsencrypt" \
     "${CERTBOT_IMAGE}" certonly --standalone \
     --non-interactive --agree-tos \
     --preferred-challenges http \
@@ -54,12 +74,19 @@ run_certbot() {
 }
 
 renew_certbot() {
+  preflight_check
   echo "[ssl] renewing certificate for ${DOMAIN} via Let's Encrypt"
+  mkdir -p "${LE_WORK_DIR}" "${LE_DIR}/logs"
   docker run --rm \
     -p 80:80 -p 443:443 \
     -v "${LE_DIR}:/etc/letsencrypt" \
-    -v "${LE_DIR}:/var/lib/letsencrypt" \
-    "${CERTBOT_IMAGE}" renew --standalone --preferred-challenges http
+    -v "${LE_WORK_DIR}:/var/lib/letsencrypt" \
+    -v "${LE_DIR}/logs:/var/log/letsencrypt" \
+    "${CERTBOT_IMAGE}" certonly --standalone \
+    --non-interactive --agree-tos \
+    --force-renewal \
+    --preferred-challenges http \
+    -d "${DOMAIN}" -m "${EMAIL}"
 }
 
 copy_live_certs() {
