@@ -1,0 +1,70 @@
+#!/bin/bash
+set -e
+
+echo "🚀 Starting Electrum Operator Setup..."
+
+# Function to install just
+install_just() {
+    if ! command -v just &> /dev/null; then
+        echo "📦 'just' command not found. Installing..."
+        if command -v curl &> /dev/null; then
+            if [ -w "/usr/local/bin" ]; then
+                curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+            else
+                echo "⚠️  /usr/local/bin is not writable. Installing to ./bin..."
+                mkdir -p ./bin
+                curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ./bin
+                export PATH="$PATH:$(pwd)/bin"
+                echo "💡 Added ./bin to PATH for this session."
+            fi
+        else
+            echo "❌ Error: 'curl' is required to install 'just'. Please install curl first."
+            exit 1
+        fi
+    else
+        echo "✅ 'just' is already installed."
+    fi
+}
+
+# 1. Install Dependencies
+install_just
+
+# 2. Check for Docker & Compose
+if ! command -v docker &> /dev/null; then
+    echo "🐳 Docker not found. Attempting to install docker-ce-cli..."
+    if command -v apt-get &> /dev/null; then
+        apt-get update && apt-get install -y ca-certificates curl gnupg
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        apt-get update && apt-get install -y docker-ce-cli
+    else
+        echo "❌ Error: Docker is not installed and couldn't be automatically installed."
+        exit 1
+    fi
+fi
+
+# 3. Create data directories
+mkdir -p data/peer data/electrum data/sockets
+
+# 4. Initialize Configs
+if [ ! -f .env ]; then
+    echo "📄 Creating .env from .env.sample..."
+    cp .env.sample .env
+fi
+
+if [ ! -f data/peer/lokid.conf ]; then
+    echo "📄 Creating data/peer/lokid.conf from sample..."
+    cp data/peer/lokid.conf.sample data/peer/lokid.conf
+fi
+
+echo ""
+echo "🎉 Setup finished successfully!"
+echo "------------------------------------------------------------------------"
+if [[ ":$PATH:" != *":$(pwd)/bin:"* ]] && [ -f "./bin/just" ]; then
+    echo "👉 Use: ./bin/just up    (to start services)"
+else
+    echo "👉 Use: just up          (to start services)"
+fi
+echo "------------------------------------------------------------------------"

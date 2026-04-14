@@ -1,6 +1,5 @@
 .env
-data/electrum/mainnet
-data/electrum/letsencrypt
-data/electrum/letsencrypt-work
-data/electrum/ssl
-data/peer/main
+data/peer/lokid.conf
+data/**
+!data/**/.keep
+!data/**/*.sample

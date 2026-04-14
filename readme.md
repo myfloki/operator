@@ -1,54 +1,49 @@
-This repository offers a package to deploy a full node environment with an Electrum server, enhancing network security and supporting community expansion.
+# Electrum Operator
 
-Included Components:
-- Flokicoin node
-- Electrum service
+Run your own Electrum server to boost wallet privacy, reduce reliance on public nodes, and help support the Flokicoin network.
 
-# Requirements
+## 🚀 Onboarding Steps
 
-- make  
-- Docker and Docker Compose
+Follow these steps to set up your Electrum operator from scratch:
 
-# Usage
+### 1. Initial Setup
+Run the `setup.sh` script. This script will:
+- Check for and install the `just` command runner if it's missing.
+- Create necessary data directories (`data/peer`, `data/electrum`, `data/sockets`).
+- Generate `.env` and `data/peer/lokid.conf` from sample files.
 
-```sh
-make start
+```bash
+./setup.sh
 ```
 
-### Enable SSL/TLS (Let's Encrypt)
+### 2. Configuration (Optional)
+Before starting the services, you can customize your installation:
+- **`.env`**: Modify ports, discord webhook, or the docker image versions.
+- **`data/peer/lokid.conf`**: Adjust peer-to-peer and RPC settings.
 
-1. Point `ELECTRUM_SSL_DOMAIN` to this host's public IP and open ports **80** and **443**.
-2. Set credentials in `.env`:
-   ```env
-   ELECTRUM_SSL_DOMAIN=electrum.example.com
-   ELECTRUM_SSL_EMAIL=admin@example.com
-   ```
-3. Issue the cert (runs certbot in a disposable container and copies to `./data/electrum/ssl`):
-   ```sh
-   make ssl
-   ```
-4. Renew when needed:
-   ```sh
-   make renew
-   ```
-After issuance/renewal, restart the TLS proxy if it's already running:
-```sh
-docker compose restart electrum_ssl
+### 3. Start the Operator
+Now that everything is configured, start the services:
+
+```bash
+just up
 ```
 
-**Optional: Enable Discord Alerts**  
-To receive alerts when the Electrum server is down, set `DISCORD_WEBHOOK_URL` in your `.env` file:
+## 🛠️ Service Management
 
-```env
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook
-```
+The operator uses `just` for common tasks:
 
-If unset, Discord notifications are skipped.
+| Command         | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `just setup`    | Re-run the onboarding/setup script.             |
+| `just up`       | Start all services in the background.           |
+| `just down`     | Stop and remove all service containers.         |
+| `just restart`  | Restart the services.                           |
+| `just logs`     | Follow logs for all services.                   |
+| `just logs-peer`| Follow logs specifically for the peer node.     |
+| `just status`   | Check the status of the containers.             |
 
-### Health Check Cron
+## 🔍 Troubleshooting
 
-To automatically monitor and restart Electrum if unhealthy, register a cron job:
-
-```sh
-make register_cron
-```
+- **Logs**: If a service fails to start, check the logs: `just logs`.
+- **Indexing**: Electrum requires a full transaction index (`txindex=1`). This is enabled by default in the sample config but may take time to build on the first run.
+- **Data Persistence**: All configuration and blockchain data are stored in the `./data` directory.
