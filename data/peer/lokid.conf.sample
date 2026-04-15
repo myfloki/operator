@@ -1,0 +1,20 @@
+[Application Options]
+datadir=/node
+logdir=/node
+nobanning=1
+notls=1
+
+; Required for Electrum
+txindex=1
+
+; RPC Configuration
+rpcuser=YOUR_RPC_USER
+rpcpass=YOUR_RPC_PASSWORD
+rpclisten=0.0.0.0
+; rpclisten=:15213
+
+; Peer-to-peer Configuration
+listen=0.0.0.0:15212
+
+[Debug]
+debuglevel=info
